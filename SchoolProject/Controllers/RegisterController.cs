@@ -44,7 +44,7 @@ namespace SchoolProject.Controllers
                 var hashedPassword = _hasher.HashPassword(request.Password);
 
                 // ✅ Buat tenant
-                var tenant = new Tenant("Sekolah B");
+                var tenant = new Tenant("Sekolah C");
                 _tenantRepo.AddTenantAsync(tenant); 
 
                 // ✅ Buat user (pakai tenant.Id yang valid)

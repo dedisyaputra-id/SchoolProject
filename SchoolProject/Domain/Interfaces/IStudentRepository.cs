@@ -6,6 +6,6 @@ namespace SchoolProject.Domain.Interfaces
     {
         Task<Student> GetByIdAsycn(Guid id, Guid tenantId);
         Task<List<Student>> GetAllStudent(Guid tenantId);
-        Task AddAsycn(Student student);
+        Task<Student> AddAsycn(Student student);
     }
 }

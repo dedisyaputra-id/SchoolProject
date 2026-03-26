@@ -14,10 +14,11 @@ namespace SchoolProject.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task AddAsycn(Domain.Entities.Student student)
+        public async Task<Student> AddAsycn(Domain.Entities.Student student)
         {
             _context.Students.Add(student);
             await _context.SaveChangesAsync();
+            return student;
         }
 
         public async Task<List<Student>> GetAllStudent(Guid tenantId)

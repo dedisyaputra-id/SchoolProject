@@ -7,9 +7,9 @@
         public string Email { get; set; }
         public Guid TenantId { get; set; }
 
-        public Student(Guid id, string name, string email, Guid tenantId)
+        public Student(string name, string email, Guid tenantId)
         {
-            Id = id;
+            Id = Guid.NewGuid();
             Name = name;
             Email = email;
             TenantId = tenantId;
