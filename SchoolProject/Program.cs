@@ -6,14 +6,22 @@ using SchoolProject.Domain.Interfaces;
 using SchoolProject.Infrastructure.Persistance;
 using SchoolProject.Infrastructure.Repositories;
 using System.Text;
-
+using Serilog;
 namespace SchoolProject
 {
     public class Program
     {
         public static void Main(string[] args)
         {
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.Console()
+                .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day, retainedFileCountLimit : 7)
+                .CreateLogger();
+
+
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Host.UseSerilog();
 
             // Add services to the container.
             builder.Services.AddDbContext<AppDbContext>(options =>

@@ -16,15 +16,19 @@ namespace SchoolProject.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IPasswordHasher _hasher;
-        public LoginController(AppDbContext context, IPasswordHasher hasher)
+        private readonly ILogger<LoginController> _logger;
+        public LoginController(AppDbContext context, IPasswordHasher hasher, ILogger<LoginController> logger)
         {
             _context = context;
             _hasher = hasher;
+            _logger = logger;
         }
         [HttpPost]
         public IActionResult Login([FromBody] LoginDTO req)
         {
-            if(string.IsNullOrEmpty(req.Email) || string.IsNullOrWhiteSpace(req.Email))
+            _logger.LogInformation("Login attempt for email: {Email}", req.Email);
+
+            if (string.IsNullOrEmpty(req.Email) || string.IsNullOrWhiteSpace(req.Email))
             {
                 return BadRequest(new { message = "Email is required" });
             }
@@ -55,11 +59,13 @@ namespace SchoolProject.Controllers
         {
             try
             {
+                _logger.LogInformation("Generating JWT token for user: {UserId}", User.Id);
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("secrete_banget_nih_key_893489hf949h_ihiweruh9834hgb4398_osdhg489h34"));
                 var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
                 var claims = new[]
                 {
+                new Claim(ClaimTypes.NameIdentifier, User.Id.ToString()),
                 new Claim(ClaimTypes.Name, User.Name),
                 new Claim(ClaimTypes.Email, User.Email),
                 new Claim(ClaimTypes.Role, User.Role),
@@ -80,6 +86,7 @@ namespace SchoolProject.Controllers
             }
             catch (Exception e)
             {
+                _logger.LogError(e, "An error occurred while generating JWT token for user: {UserId}", User.Id);
                 throw;
             }
         }
