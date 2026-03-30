@@ -4,6 +4,7 @@
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public List<Subscription> Subscriptions { get; set; }
         public Tenant(string name)
         {
             Id = Guid.NewGuid();

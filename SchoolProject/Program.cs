@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using SchoolProject.Domain.Entities;
 using SchoolProject.Domain.Interfaces;
 using SchoolProject.Infrastructure.Persistance;
 using SchoolProject.Infrastructure.Repositories;
@@ -22,6 +23,11 @@ namespace SchoolProject
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
             builder.Services.AddScoped<ITenantRepository, TenantRepository>();
+            builder.Services.AddScoped<ISubcriptionPlan, SubscriptionPlanRepository>();
+            builder.Services.AddScoped<ISubscription, SubscriptionRepository>();
+            builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
+            builder.Services.AddScoped<IClassRepository, ClassRepository>();
+            builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
 
             builder.Services.AddControllersWithViews();
 

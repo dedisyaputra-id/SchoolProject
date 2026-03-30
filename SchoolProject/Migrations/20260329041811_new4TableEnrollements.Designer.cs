@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolProject.Infrastructure.Persistance;
 
@@ -11,9 +12,11 @@ using SchoolProject.Infrastructure.Persistance;
 namespace SchoolProject.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260329041811_new4TableEnrollements")]
+    partial class new4TableEnrollements
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,10 +62,6 @@ namespace SchoolProject.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("HomeroomTeacherId");
-
-                    b.HasIndex("MajorId");
 
                     b.HasIndex("TenantId");
 
@@ -115,39 +114,6 @@ namespace SchoolProject.Migrations
                     b.ToTable("Enrollments");
                 });
 
-            modelBuilder.Entity("SchoolProject.Domain.Entities.Major", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
-
-                    b.ToTable("Majors");
-                });
-
             modelBuilder.Entity("SchoolProject.Domain.Entities.Schedule", b =>
                 {
                     b.Property<Guid>("Id")
@@ -178,8 +144,6 @@ namespace SchoolProject.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("SubjectId");
-
-                    b.HasIndex("TeacherId");
 
                     b.HasIndex("TenantId");
 
@@ -247,8 +211,6 @@ namespace SchoolProject.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MajorId");
-
                     b.HasIndex("TenantId");
 
                     b.ToTable("Subjects");
@@ -311,42 +273,6 @@ namespace SchoolProject.Migrations
                     b.ToTable("SubscriptionPlans");
                 });
 
-            modelBuilder.Entity("SchoolProject.Domain.Entities.Teacher", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("EmployeeNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
-
-                    b.HasIndex("TenantId", "Email");
-
-                    b.ToTable("Teachers");
-                });
-
             modelBuilder.Entity("SchoolProject.Domain.Entities.Tenant", b =>
                 {
                     b.Property<Guid>("Id")
@@ -400,23 +326,6 @@ namespace SchoolProject.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("SchoolProject.Domain.Entities.Class", b =>
-                {
-                    b.HasOne("SchoolProject.Domain.Entities.Teacher", "HomeroomTeacher")
-                        .WithMany("HomeroomClasses")
-                        .HasForeignKey("HomeroomTeacherId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("SchoolProject.Domain.Entities.Major", "Major")
-                        .WithMany("Classes")
-                        .HasForeignKey("MajorId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("HomeroomTeacher");
-
-                    b.Navigation("Major");
-                });
-
             modelBuilder.Entity("SchoolProject.Domain.Entities.Enrollment", b =>
                 {
                     b.HasOne("SchoolProject.Domain.Entities.Class", "Class")
@@ -450,12 +359,6 @@ namespace SchoolProject.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SchoolProject.Domain.Entities.Teacher", null)
-                        .WithMany("Schedules")
-                        .HasForeignKey("TeacherId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Class");
 
                     b.Navigation("Subject");
@@ -468,16 +371,6 @@ namespace SchoolProject.Migrations
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("SchoolProject.Domain.Entities.Subject", b =>
-                {
-                    b.HasOne("SchoolProject.Domain.Entities.Major", "Major")
-                        .WithMany("Subjects")
-                        .HasForeignKey("MajorId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Major");
                 });
 
             modelBuilder.Entity("SchoolProject.Domain.Entities.Subscription", b =>
@@ -514,13 +407,6 @@ namespace SchoolProject.Migrations
                     b.Navigation("Schedules");
                 });
 
-            modelBuilder.Entity("SchoolProject.Domain.Entities.Major", b =>
-                {
-                    b.Navigation("Classes");
-
-                    b.Navigation("Subjects");
-                });
-
             modelBuilder.Entity("SchoolProject.Domain.Entities.Student", b =>
                 {
                     b.Navigation("Enrollments");
@@ -528,13 +414,6 @@ namespace SchoolProject.Migrations
 
             modelBuilder.Entity("SchoolProject.Domain.Entities.Subject", b =>
                 {
-                    b.Navigation("Schedules");
-                });
-
-            modelBuilder.Entity("SchoolProject.Domain.Entities.Teacher", b =>
-                {
-                    b.Navigation("HomeroomClasses");
-
                     b.Navigation("Schedules");
                 });
 

@@ -2,10 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolProject.Domain.Interfaces;
 using SchoolProject.Infrastructure.Repositories;
+using System.Threading.Tasks;
 
 namespace SchoolProject.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "superadmin")]
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : ControllerBase
@@ -15,11 +16,13 @@ namespace SchoolProject.Controllers
         { 
             _userRepo = userRepo;
         }
-        [Authorize(Roles = "admin")]
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            var data = _userRepo.GetAllAsync();
+            var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+
+            var data = await _userRepo.GetAllAsync(Convert.ToString(email));
+
             return Ok(new {data = data, message = "Get all data users"});
         }
     }

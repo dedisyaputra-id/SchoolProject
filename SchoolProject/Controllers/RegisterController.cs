@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using SchoolProject.Domain.Entities;
+using SchoolProject.Domain.Entities.DTO;
 using SchoolProject.Domain.Interfaces;
 using SchoolProject.Infrastructure.Repositories;
 using System.IdentityModel.Tokens.Jwt;
@@ -44,7 +45,7 @@ namespace SchoolProject.Controllers
                 var hashedPassword = _hasher.HashPassword(request.Password);
 
                 // ✅ Buat tenant
-                var tenant = new Tenant("Sekolah C");
+                var tenant = new Tenant("Sekolah A");
                 _tenantRepo.AddTenantAsync(tenant); 
 
                 // ✅ Buat user (pakai tenant.Id yang valid)

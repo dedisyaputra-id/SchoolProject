@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolProject.Infrastructure.Persistance;
 
@@ -11,9 +12,11 @@ using SchoolProject.Infrastructure.Persistance;
 namespace SchoolProject.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260329042403_tblMajor")]
+    partial class tblMajor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,8 +62,6 @@ namespace SchoolProject.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("HomeroomTeacherId");
 
                     b.HasIndex("MajorId");
 
@@ -145,7 +146,7 @@ namespace SchoolProject.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("Majors");
+                    b.ToTable("Major");
                 });
 
             modelBuilder.Entity("SchoolProject.Domain.Entities.Schedule", b =>
@@ -178,8 +179,6 @@ namespace SchoolProject.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("SubjectId");
-
-                    b.HasIndex("TeacherId");
 
                     b.HasIndex("TenantId");
 
@@ -311,42 +310,6 @@ namespace SchoolProject.Migrations
                     b.ToTable("SubscriptionPlans");
                 });
 
-            modelBuilder.Entity("SchoolProject.Domain.Entities.Teacher", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("EmployeeNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
-
-                    b.HasIndex("TenantId", "Email");
-
-                    b.ToTable("Teachers");
-                });
-
             modelBuilder.Entity("SchoolProject.Domain.Entities.Tenant", b =>
                 {
                     b.Property<Guid>("Id")
@@ -402,17 +365,10 @@ namespace SchoolProject.Migrations
 
             modelBuilder.Entity("SchoolProject.Domain.Entities.Class", b =>
                 {
-                    b.HasOne("SchoolProject.Domain.Entities.Teacher", "HomeroomTeacher")
-                        .WithMany("HomeroomClasses")
-                        .HasForeignKey("HomeroomTeacherId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("SchoolProject.Domain.Entities.Major", "Major")
                         .WithMany("Classes")
                         .HasForeignKey("MajorId")
                         .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("HomeroomTeacher");
 
                     b.Navigation("Major");
                 });
@@ -448,12 +404,6 @@ namespace SchoolProject.Migrations
                         .WithMany("Schedules")
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("SchoolProject.Domain.Entities.Teacher", null)
-                        .WithMany("Schedules")
-                        .HasForeignKey("TeacherId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Class");
@@ -528,13 +478,6 @@ namespace SchoolProject.Migrations
 
             modelBuilder.Entity("SchoolProject.Domain.Entities.Subject", b =>
                 {
-                    b.Navigation("Schedules");
-                });
-
-            modelBuilder.Entity("SchoolProject.Domain.Entities.Teacher", b =>
-                {
-                    b.Navigation("HomeroomClasses");
-
                     b.Navigation("Schedules");
                 });
 

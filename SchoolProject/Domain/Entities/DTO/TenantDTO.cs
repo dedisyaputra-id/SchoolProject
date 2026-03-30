@@ -1,4 +1,4 @@
-﻿namespace SchoolProject.Domain.Entities
+﻿namespace SchoolProject.Domain.Entities.DTO
 {
     public class TenantDTO
     {

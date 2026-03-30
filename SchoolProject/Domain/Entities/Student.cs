@@ -6,6 +6,7 @@
         public string Name { get; set; }
         public string Email { get; set; }
         public Guid TenantId { get; set; }
+        public ICollection<Enrollment> Enrollments { get; set; }
 
         public Student(string name, string email, Guid tenantId)
         {

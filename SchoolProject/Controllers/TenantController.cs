@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SchoolProject.Domain.Entities;
+using SchoolProject.Domain.Entities.DTO;
 using SchoolProject.Domain.Interfaces;
 using SchoolProject.Infrastructure.Repositories;
 

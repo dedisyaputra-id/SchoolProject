@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SchoolProject.Domain.Entities;
+using SchoolProject.Domain.Entities.DTO;
 using SchoolProject.Domain.Interfaces;
 
 namespace SchoolProject.Controllers
@@ -11,9 +12,11 @@ namespace SchoolProject.Controllers
     public class StudentController : ControllerBase
     {
         private readonly IStudentRepository _studentRepo;
-        public StudentController(IStudentRepository studentRepo)
+        private readonly ISubscription _subscription;
+        public StudentController(IStudentRepository studentRepo, ISubscription subcription)
         {
             _studentRepo = studentRepo;
+            _subscription = subcription;
         }
 
         [Authorize(Roles = "admin,teacher")]
@@ -36,6 +39,13 @@ namespace SchoolProject.Controllers
             try
             {
                 var tenantId = HttpContext?.User?.FindFirst("tenantId")?.Value;
+
+                var subscription = await _subscription.GetByTenantId(Guid.Parse(tenantId));
+
+                if(subscription == null)
+                {
+                    return BadRequest(new { message = "Subscription not found for the tenant, cannot insert data student" });
+                }
 
                 var student = new Student(req.Name, req.Email, Guid.Parse(tenantId));
 

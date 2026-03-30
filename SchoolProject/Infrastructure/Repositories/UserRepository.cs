@@ -12,9 +12,9 @@ namespace SchoolProject.Infrastructure.Repositories
             _context = context;
         }
 
-        public Task<List<User>> GetAllAsync()
+        public Task<List<User>> GetAllAsync(string email)
         {
-            var users = _context.Users.ToList();
+            var users = _context.Users.Where(u => u.Email != email).ToList();
             return Task.FromResult(users);
         }
 

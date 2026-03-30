@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using SchoolProject.Domain.Entities;
+using SchoolProject.Domain.Entities.DTO;
 using SchoolProject.Domain.Interfaces;
 using SchoolProject.Infrastructure.Persistance;
 using System.IdentityModel.Tokens.Jwt;
