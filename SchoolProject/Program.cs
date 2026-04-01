@@ -1,17 +1,18 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using SchoolProject.Data.Seeder;
 using SchoolProject.Domain.Entities;
 using SchoolProject.Domain.Interfaces;
 using SchoolProject.Infrastructure.Persistance;
 using SchoolProject.Infrastructure.Repositories;
-using System.Text;
 using Serilog;
+using System.Text;
 namespace SchoolProject
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.Console()
@@ -64,6 +65,13 @@ namespace SchoolProject
             builder.Services.AddControllers();
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+                await StudentSeeder.SeedStudents(context);
+            }
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
