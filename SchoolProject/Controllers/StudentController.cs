@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using SchoolProject.Domain.Entities;
 using SchoolProject.Domain.Entities.DTO;
 using SchoolProject.Domain.Interfaces;
@@ -19,12 +20,14 @@ namespace SchoolProject.Controllers
         private readonly ISubscription _subscription;
         private readonly ILogger<StudentController> _logger;
         private readonly IServiceProvider _serviceProvider;
-        public StudentController(IStudentRepository studentRepo, ISubscription subcription, ILogger<StudentController> logger, IServiceProvider serviceProvider)
+        private readonly IMemoryCache _cache;
+        public StudentController(IStudentRepository studentRepo, ISubscription subcription, ILogger<StudentController> logger, IServiceProvider serviceProvider, IMemoryCache cache)
         {
             _studentRepo = studentRepo;
             _subscription = subcription;
             _logger = logger;
             _serviceProvider = serviceProvider;
+            _cache = cache;
         }
 
         [Authorize(Roles = "admin,teacher")]
@@ -33,11 +36,23 @@ namespace SchoolProject.Controllers
         {
             try
             {
+
                 var tenantId = HttpContext?.User?.FindFirst("tenantId")?.Value;
+                string cacheKey = $"students_{tenantId}";
 
                 _logger.LogInformation("Getting all students with tenantId : {TenantId}", tenantId);
 
-                var data = await _studentRepo.GetAllStudent(Guid.Parse(tenantId));
+                if(!_cache.TryGetValue(cacheKey, out List<Student> data))
+                {
+                    data = await _studentRepo.GetAllStudent(Guid.Parse(tenantId));
+
+                    var cacheOptions = new MemoryCacheEntryOptions()
+                        .SetAbsoluteExpiration(TimeSpan.FromMinutes(10))
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(2));
+
+                    _cache.Set(cacheKey, data, cacheOptions);
+                }
+
                 return Ok(new { data = data, message = "Get all data student" });
             }
             catch (Exception ex)

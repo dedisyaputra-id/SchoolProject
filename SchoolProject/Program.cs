@@ -44,6 +44,8 @@ namespace SchoolProject
             builder.Services.AddHangfireServer();
             builder.Services.AddScoped<StudentExportRepository>();
 
+            builder.Services.AddMemoryCache();
+
             builder.Services.AddControllersWithViews();
 
             var jwtSettings = builder.Configuration.GetSection("Jwt");
