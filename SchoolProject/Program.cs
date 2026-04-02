@@ -8,6 +8,8 @@ using SchoolProject.Infrastructure.Persistance;
 using SchoolProject.Infrastructure.Repositories;
 using Serilog;
 using System.Text;
+using Hangfire;
+using Hangfire.MemoryStorage;
 namespace SchoolProject
 {
     public class Program
@@ -37,6 +39,10 @@ namespace SchoolProject
             builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
             builder.Services.AddScoped<IClassRepository, ClassRepository>();
             builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+
+            builder.Services.AddHangfire(config => config.UseMemoryStorage());
+            builder.Services.AddHangfireServer();
+            builder.Services.AddScoped<StudentExportRepository>();
 
             builder.Services.AddControllersWithViews();
 

@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SchoolProject.Domain.Entities;
 using SchoolProject.Domain.Entities.DTO;
 using SchoolProject.Domain.Interfaces;
+using SchoolProject.Infrastructure.Repositories;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 
@@ -16,11 +18,13 @@ namespace SchoolProject.Controllers
         private readonly IStudentRepository _studentRepo;
         private readonly ISubscription _subscription;
         private readonly ILogger<StudentController> _logger;
-        public StudentController(IStudentRepository studentRepo, ISubscription subcription, ILogger<StudentController> logger)
+        private readonly IServiceProvider _serviceProvider;
+        public StudentController(IStudentRepository studentRepo, ISubscription subcription, ILogger<StudentController> logger, IServiceProvider serviceProvider)
         {
             _studentRepo = studentRepo;
             _subscription = subcription;
             _logger = logger;
+            _serviceProvider = serviceProvider;
         }
 
         [Authorize(Roles = "admin,teacher")]
@@ -76,6 +80,17 @@ namespace SchoolProject.Controllers
                 _logger.LogError(ex, "An error occurred while creating the student");
                 return StatusCode(500, new { message = "An error occurred while creating the student", error = ex.Message });
             }
+        }
+        [HttpPost("export")]
+        public async Task<IActionResult> ExportStudents()
+        {
+            var tenantId = Guid.Parse(HttpContext?.User?.FindFirst("tenantId")?.Value);
+            using var scope = _serviceProvider.CreateScope();
+            var exportService = scope.ServiceProvider.GetRequiredService<StudentExportRepository>();
+
+            BackgroundJob.Enqueue(() => exportService.ExportStudentToExcel(tenantId));
+
+            return Ok(new { message = "Student export job has been queued" });
         }
     }
 }
