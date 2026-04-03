@@ -32,7 +32,7 @@ namespace SchoolProject.Controllers
 
         [Authorize(Roles = "admin,teacher")]
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get([FromQuery] PaginationParams param)
         {
             try
             {
@@ -40,11 +40,20 @@ namespace SchoolProject.Controllers
                 var tenantId = HttpContext?.User?.FindFirst("tenantId")?.Value;
                 string cacheKey = $"students_{tenantId}";
 
+                if(param.PageNumber != null)
+                {
+                    cacheKey += $"_page_{param.PageNumber}";
+                }
+                if(param.PageSize != null)
+                {
+                    cacheKey += $"_size_{param.PageSize}";
+                }
+
                 _logger.LogInformation("Getting all students with tenantId : {TenantId}", tenantId);
 
-                if(!_cache.TryGetValue(cacheKey, out List<Student> data))
+                if(!_cache.TryGetValue(cacheKey, out PagedResult<Student> data))
                 {
-                    data = await _studentRepo.GetAllStudent(Guid.Parse(tenantId));
+                    data = await _studentRepo.GetAllStudent(Guid.Parse(tenantId), param);
 
                     var cacheOptions = new MemoryCacheEntryOptions()
                         .SetAbsoluteExpiration(TimeSpan.FromMinutes(10))
@@ -53,7 +62,7 @@ namespace SchoolProject.Controllers
                     _cache.Set(cacheKey, data, cacheOptions);
                 }
 
-                return Ok(new { data = data, message = "Get all data student" });
+                return Ok(new { result = data, message = "Get all data student" });
             }
             catch (Exception ex)
             {
