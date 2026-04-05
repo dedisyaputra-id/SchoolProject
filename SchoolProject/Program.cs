@@ -10,6 +10,7 @@ using Serilog;
 using System.Text;
 using Hangfire;
 using Hangfire.MemoryStorage;
+using SchoolProject.Middlewares;
 namespace SchoolProject
 {
     public class Program
@@ -93,6 +94,8 @@ namespace SchoolProject
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseMiddleware<ErrorHandlingMiddleware>();
 
             app.UseAuthentication();
             app.UseAuthorization();

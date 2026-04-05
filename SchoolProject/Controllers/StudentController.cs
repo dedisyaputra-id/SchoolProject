@@ -5,6 +5,7 @@ using Microsoft.Extensions.Caching.Memory;
 using SchoolProject.Domain.Entities;
 using SchoolProject.Domain.Entities.DTO;
 using SchoolProject.Domain.Interfaces;
+using SchoolProject.Exceptions;
 using SchoolProject.Infrastructure.Repositories;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
@@ -40,18 +41,18 @@ namespace SchoolProject.Controllers
                 var tenantId = HttpContext?.User?.FindFirst("tenantId")?.Value;
                 string cacheKey = $"students_{tenantId}";
 
-                if(param.PageNumber != null)
+                if (param.PageNumber != null)
                 {
                     cacheKey += $"_page_{param.PageNumber}";
                 }
-                if(param.PageSize != null)
+                if (param.PageSize != null)
                 {
                     cacheKey += $"_size_{param.PageSize}";
                 }
 
                 _logger.LogInformation("Getting all students with tenantId : {TenantId}", tenantId);
 
-                if(!_cache.TryGetValue(cacheKey, out PagedResult<Student> data))
+                if (!_cache.TryGetValue(cacheKey, out PagedResult<Student> data))
                 {
                     data = await _studentRepo.GetAllStudent(Guid.Parse(tenantId), param);
 
@@ -69,6 +70,20 @@ namespace SchoolProject.Controllers
                 _logger.LogError(ex, "An error occurred while getting students");
                 return StatusCode(500, new { message = "An error occurred while getting students", error = ex.Message });
             }
+        }
+
+        [Authorize(Roles = "admin,teacher")]
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<IActionResult> GetById([FromQuery] Guid id)
+        {
+            var tenantId = HttpContext?.User?.FindFirst("tenantId")?.Value;
+            var student = await _studentRepo.GetByIdAsycn(id, Guid.Parse(tenantId));
+            if (student == null)
+            {
+                throw new NotFoundException("Studen not found");
+            }
+            return Ok(new { result = student, message = "Get student by id" });
         }
 
         [Authorize(Roles = "admin")]
