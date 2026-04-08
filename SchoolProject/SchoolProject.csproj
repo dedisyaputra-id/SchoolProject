@@ -7,8 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Dockerfile" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Application\" />
     <Folder Include="Infrastructure\Persistance\Configurations\" />
+  </ItemGroup>
+  <ItemGroup>
+  	<None Include="Dockerfile" />
+  	<Compile Remove="Dockerfile" />
   </ItemGroup>
 
   <ItemGroup>
